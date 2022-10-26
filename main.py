@@ -7,14 +7,14 @@ app = Flask(__name__)
 
 nmodel=nbModel()
 
-@app.route('/')
+@app.route('/data')
 def hello_world():
     df = pd.read_csv('static/data.csv', dtype=str)
     html = df.to_html()
     return html
     
 
-@app.route('/index', methods=["POST", "GET"])
+@app.route('/', methods=["POST", "GET"])
 def index():
     return render_template('index.html')
 
