@@ -9,7 +9,7 @@ function hello() {
     var msg = document.getElementById("email-6564").value
     // var textarea = document.getElementById('emai6564');
 
-    axios.post('http://localhost:5000/result', {
+    axios.post('http://139.150.65.139:5000/result', {
         msg: msg
     })
         .then(function (response) {
@@ -32,7 +32,7 @@ function training() {
     var msg = document.getElementById("email-6564").value
     // var textarea = document.getElementById('emai6564');
 
-    axios.get('http://localhost:5000/train')
+    axios.get('http://139.150.65.139:5000/train')
         .then(function (response) {
             alert("학습이 완료되었습니다.", 'info')
         })
