@@ -9,18 +9,19 @@ function hello() {
     var msg = document.getElementById("email-6564").value
     // var textarea = document.getElementById('emai6564');
 
-    axios.post('http://139.150.65.139:5000/result', {
+    axios.post('http://localhost:5000/mbti/result', {
         msg: msg
     })
         .then(function (response) {
-            const checkMsg  = response.data
-            checkMsgArray = checkMsg.split("#")
-            if (checkMsgArray[0] == 1){
-                alert(checkMsgArray[1], 'warning')
-            }else{
-                alert(checkMsgArray[1], 'success')
-            }
-            
+            const checkMsg = response.data
+            alert(checkMsg, 'info')
+            console.log(checkMsg);
+            //if (checkMsgArray[0] == 1){
+            //    alert(checkMsgArray[1], 'warning')
+            //}else{
+            //    alert(checkMsgArray[1], 'success')
+            //}
+
         })
         .catch(function (error) {
             console.log(error);
@@ -32,7 +33,7 @@ function training() {
     var msg = document.getElementById("email-6564").value
     // var textarea = document.getElementById('emai6564');
 
-    axios.get('http://139.150.65.139:5000/train')
+    axios.get('http://139.150.65.139:5000//mbti/train')
         .then(function (response) {
             alert("학습이 완료되었습니다.", 'info')
         })
