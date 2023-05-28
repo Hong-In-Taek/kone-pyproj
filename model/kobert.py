@@ -14,6 +14,7 @@ from kobert_tokenizer import KoBERTTokenizer
 
 from transformers import BertForSequenceClassification as BertModel
 tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
+
 batch_size = 16
 sequence_length = 128
 num_epochs = 5
@@ -45,12 +46,12 @@ class kobertMbti:
         test_data = pd.DataFrame([sentence], columns=['text'])
         print(test_data)
         # Evaluation
-        #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # torch.cuda.empty_cache()
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        torch.cuda.empty_cache()
         test_dataset = Test_Dataset(test_data)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
-        model = BertModel.from_pretrained('skt/kobert-base-v1')
+        self.model = BertModel.from_pretrained('skt/kobert-base-v1')
         if finetuned:
             if kind == "1":
                 self.model.load_state_dict(torch.load(
@@ -67,30 +68,29 @@ class kobertMbti:
             else:
                 self.model.load_state_dict(torch.load(
                     'static/models/best_kobert.pt_1.pt'))
+        self.model.to(device)
+        self.model.eval()
 
-        model.eval()
+        with torch.no_grad():
+            for input in test_loader:
 
-        # with torch.no_grad():
+                ids = input['input_ids'].view(
+                    batch_size, -1)  # 100, 1, 128 => 100, 128
+                ids = ids.to(device)
+                att_mask = input['attention_mask'].view(batch_size, -1)
+                att_mask = att_mask.to(device)
 
-        for input in test_loader:
+                with torch.no_grad():
+                    output = self.model(ids, att_mask)
 
-            ids = input['input_ids'].view(
-                batch_size, -1)  # 100, 1, 128 => 100, 128
-            #ids = ids.to(device)
-            att_mask = input['attention_mask'].view(batch_size, -1)
-            #att_mask = att_mask.to(device)
+                    recommendation = torch.round(
+                        output.logits.softmax(dim=-1)[:, 1] * 10).sum().item()
 
-            # with torch.no_grad():
-            output = model(ids, att_mask)
-
-            recommendation = torch.round(
-                output.logits.softmax(dim=-1)[:, 1] * 10).sum().item()
-
-            # 앱 추천 지수 출력
-            # print('Recommendation score: {} %'.format(predicted))
-            print('Recommendation score: {} %'.format(recommendation))
-            print('---------------------------------------------')
-            return recommendation
+                    # 앱 추천 지수 출력
+                    # print('Recommendation score: {} %'.format(predicted))
+                    print('Recommendation score: {} %'.format(recommendation))
+                    print('---------------------------------------------')
+                    return recommendation
 
     def mbtiFuction(self, sentence):
         mbti = ""
