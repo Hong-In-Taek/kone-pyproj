@@ -16,6 +16,12 @@ function hello() {
             const checkMsg = response.data
             alert(checkMsg, 'info')
             console.log(checkMsg);
+
+
+            var imageUrl = response.image_url;
+            showPopup(imageUrl);
+
+
             //if (checkMsgArray[0] == 1){
             //    alert(checkMsgArray[1], 'warning')
             //}else{
@@ -55,4 +61,17 @@ var alert = function (msg, type) {
         customClass: 'sweet-size',
         showConfirmButton: false
     });
+}
+
+
+function showPopup(imageUrl) {
+    var popup = document.getElementById('popup');
+    var image = document.getElementById('popup-image');
+    image.src = imageUrl;
+    popup.style.display = 'block';
+}
+
+function hidePopup() {
+    var popup = document.getElementById('popup');
+    popup.style.display = 'none';
 }
