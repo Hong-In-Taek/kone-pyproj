@@ -18,9 +18,8 @@ function hello() {
             console.log(checkMsg);
 
 
-            var imageUrl = response.image_url;
-            showPopup(imageUrl);
-
+            var imageUrl = "http://139.150.65.139:5000/popup?mbti=" + checkMsg;
+            window.open(imageUrl, 'popupWindow', 'width=500,height=500')
 
             //if (checkMsgArray[0] == 1){
             //    alert(checkMsgArray[1], 'warning')
@@ -49,6 +48,19 @@ function training() {
 }
 
 
+function popup(url) {
+    axios.post('http://139.150.65.139:5000/popup', {
+        url: url
+    })
+        .then(function (response) {
+            alert("학습이 완료되었습니다.", 'info')
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+}
+
 
 
 
@@ -63,15 +75,3 @@ var alert = function (msg, type) {
     });
 }
 
-
-function showPopup(imageUrl) {
-    var popup = document.getElementById('popup');
-    var image = document.getElementById('popup-image');
-    image.src = imageUrl;
-    popup.style.display = 'block';
-}
-
-function hidePopup() {
-    var popup = document.getElementById('popup');
-    popup.style.display = 'none';
-}
