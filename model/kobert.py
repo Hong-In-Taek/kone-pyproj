@@ -54,16 +54,16 @@ class kobertMbti:
         if finetuned:
             if kind == "1":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert.pt_1.pt'))
+                    'static/models/best_kobert_1.pt'))
             elif kind == "2":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert.pt_2.pt'))
+                    'static/models/best_kobert_2.pt'))
             elif kind == "3":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert.pt_3.pt'))
+                    'static/models/best_kobert_3.pt'))
             elif kind == "4":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert.pt_4.pt'))
+                    'static/models/best_kobert_4.pt'))
             else:
                 self.model.load_state_dict(torch.load(
                     'static/models/best_kobert.pt_1.pt'))
