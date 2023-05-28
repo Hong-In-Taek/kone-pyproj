@@ -46,28 +46,28 @@ class kobertMbti:
         test_data = pd.DataFrame([sentence], columns=['text'])
         print(test_data)
         # Evaluation
-        device = torch.device('cuda')
-        torch.cuda.empty_cache()
+      #  device = torch.device('cuda')
+      #  torch.cuda.empty_cache()
         test_dataset = Test_Dataset(test_data)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
         if finetuned:
             if kind == "1":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert_1.pt'))
+                    'static/models/best_kobert_1.pt', map_location=torch.device('cpu')))
             elif kind == "2":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert_2.pt'))
+                    'static/models/best_kobert_2.pt', map_location=torch.device('cpu')))
             elif kind == "3":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert_3.pt'))
+                    'static/models/best_kobert_3.pt', map_location=torch.device('cpu')))
             elif kind == "4":
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert_4.pt'))
+                    'static/models/best_kobert_4.pt', map_location=torch.device('cpu')))
             else:
                 self.model.load_state_dict(torch.load(
-                    'static/models/best_kobert.pt_1.pt'))
-        self.model.to(device)
+                    'static/models/best_kobert.pt_1.pt', map_location=torch.device('cpu')))
+       # self.model.to(device)
         self.model.eval()
 
         with torch.no_grad():
@@ -75,9 +75,9 @@ class kobertMbti:
 
                 ids = input['input_ids'].view(
                     batch_size, -1)  # 100, 1, 128 => 100, 128
-                ids = ids.to(device)
+         #       ids = ids.to(device)
                 att_mask = input['attention_mask'].view(batch_size, -1)
-                att_mask = att_mask.to(device)
+          #      att_mask = att_mask.to(device)
 
                 with torch.no_grad():
                     output = self.model(ids, att_mask)
