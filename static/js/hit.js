@@ -9,6 +9,11 @@ function hello() {
     var msg = document.getElementById("email-6564").value
     // var textarea = document.getElementById('emai6564');
 
+    // 로딩 바 엘리먼트 가져오기
+    var loadingBar = document.getElementById("loading-bar-container");
+
+    // 로딩 바 표시
+    loadingBar.style.display = "block";
     axios.post('http://139.150.65.139:5000/mbti/result', {
         msg: msg
     })
@@ -17,9 +22,13 @@ function hello() {
             alert(checkMsg, 'info')
             console.log(checkMsg);
 
+            // 로딩 바 숨김 처리
+            loadingBar.style.display = "none";
+
 
             var imageUrl = "http://139.150.65.139:5000/popup?mbti=" + checkMsg;
             window.open(imageUrl, 'popupWindow', 'width=400,height=500')
+
 
             //if (checkMsgArray[0] == 1){
             //    alert(checkMsgArray[1], 'warning')
