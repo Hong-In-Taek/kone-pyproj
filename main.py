@@ -32,7 +32,7 @@ def mbtiTrainingFunction():
 @app.route('/popup', methods=['GET'])
 def popup():
     mbtivalue = request.args.get('mbti')  # 입력된 텍스트 값 받아오기
-    imageUrl = "static/"+mbtivalue.upper()+".png"
+    imageUrl = "static/images/"+mbtivalue.upper()+".png"
     return render_template('popup.html', image_url=imageUrl)
 
 

@@ -19,7 +19,7 @@ function hello() {
 
 
             var imageUrl = "http://139.150.65.139:5000/popup?mbti=" + checkMsg;
-            window.open(imageUrl, 'popupWindow', 'width=500,height=500')
+            window.open(imageUrl, 'popupWindow', 'width=400,height=500')
 
             //if (checkMsgArray[0] == 1){
             //    alert(checkMsgArray[1], 'warning')
