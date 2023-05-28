@@ -45,8 +45,8 @@ class kobertMbti:
         test_data = pd.DataFrame([sentence], columns=['text'])
         print(test_data)
         # Evaluation
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        torch.cuda.empty_cache()
+        #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        # torch.cuda.empty_cache()
         test_dataset = Test_Dataset(test_data)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
@@ -67,30 +67,30 @@ class kobertMbti:
             else:
                 self.model.load_state_dict(torch.load(
                     'static/models/best_kobert.pt_1.pt'))
-        model.to(device)
+
         model.eval()
 
-        with torch.no_grad():
+        # with torch.no_grad():
 
-            for input in test_loader:
+        for input in test_loader:
 
-                ids = input['input_ids'].view(
-                    batch_size, -1)  # 100, 1, 128 => 100, 128
-                ids = ids.to(device)
-                att_mask = input['attention_mask'].view(batch_size, -1)
-                att_mask = att_mask.to(device)
+            ids = input['input_ids'].view(
+                batch_size, -1)  # 100, 1, 128 => 100, 128
+            #ids = ids.to(device)
+            att_mask = input['attention_mask'].view(batch_size, -1)
+            #att_mask = att_mask.to(device)
 
-                with torch.no_grad():
-                    output = model(ids, att_mask)
+            # with torch.no_grad():
+            output = model(ids, att_mask)
 
-                recommendation = torch.round(
-                    output.logits.softmax(dim=-1)[:, 1] * 10).sum().item()
+            recommendation = torch.round(
+                output.logits.softmax(dim=-1)[:, 1] * 10).sum().item()
 
-                # 앱 추천 지수 출력
+            # 앱 추천 지수 출력
             # print('Recommendation score: {} %'.format(predicted))
-                print('Recommendation score: {} %'.format(recommendation))
-                print('---------------------------------------------')
-                return recommendation
+            print('Recommendation score: {} %'.format(recommendation))
+            print('---------------------------------------------')
+            return recommendation
 
     def mbtiFuction(self, sentence):
         mbti = ""
