@@ -1,15 +1,19 @@
-'''import os
+
+import os
 import torch
+from torch import nn
+import torch.nn.functional as F
+import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import pandas as pd
 from tqdm import tqdm, tqdm_notebook
+
+
 from kobert_tokenizer import KoBERTTokenizer
-from transformers import BertForSequenceClassification as BertModel
 
 
 tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
-
 batch_size = 16
 sequence_length = 128
 num_epochs = 5
@@ -27,60 +31,91 @@ class Test_Dataset(Dataset):
         return len(self.x)
 
     def __getitem__(self, idx):
-
-        x = tokenizer(self.x[idx], padding='max_length',
-                      truncation=True, return_tensors="pt", max_length=128)
-
+        x = tokenizer(self.x[idx], padding='max_length', truncation=True,
+                      return_tensors="pt", max_length=sequence_length)
         return x
 
 
-def Analyze_data_sentencetest(sentense, finetuned=True):
-    # Preprocessing
-    pos = 0
-    neg = 0
-
-    test_data = pd.DataFrame({'text': [sentense]})
-    device = torch.device('cpu')
-    # Evaluation
-    torch.cuda.empty_cache()
-    test_dataset = Test_Dataset(test_data)
-    print(test_data)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+class kobertMbti:
 
     model = BertModel.from_pretrained('skt/kobert-base-v1')
-    # 미세조정을 거친 모델을 사용할 것인지,
-    # 거치지 않은 모델을 사용할 것인지.
 
-    model.load_state_dict(torch.load('static/models/best_kobert.pt'))
+    def analyze_sentence(self, sentence, kind, finetuned=True):
+        # Preprocessing
+        test_data = pd.DataFrame([sentence], columns=['text'])
+        print(test_data)
+        # Evaluation
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        torch.cuda.empty_cache()
+        test_dataset = Test_Dataset(test_data)
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
-    model.eval()
-    sizerecon = 0
-    with torch.no_grad():
-        for input in test_loader:
-            ids = input['input_ids'].view(
-                batch_size, -1)  # 100, 1, 128 => 100, 128
-            ids = ids.to(device)
-            att_mask = input['attention_mask'].view(batch_size, -1)
-            att_mask = att_mask.to(device)
+        model = BertModel.from_pretrained('skt/kobert-base-v1')
+        if finetuned:
+            if kind == "1":
+                self.model.load_state_dict(torch.load(
+                    'static/models/best_kobert.pt_1.pt'))
+            elif kind == "2":
+                self.model.load_state_dict(torch.load(
+                    'static/models/best_kobert.pt_2.pt'))
+            elif kind == "3":
+                self.model.load_state_dict(torch.load(
+                    'static/models/best_kobert.pt_3.pt'))
+            elif kind == "4":
+                self.model.load_state_dict(torch.load(
+                    'static/models/best_kobert.pt_4.pt'))
+            else:
+                self.model.load_state_dict(torch.load(
+                    'static/models/best_kobert.pt_1.pt'))
+        model.to(device)
+        model.eval()
 
-            with torch.no_grad():
-                output = model(ids, att_mask)
+        with torch.no_grad():
 
-            recommendation = torch.round(
-                output.logits.softmax(dim=-1)[:, 1]*10)
-            sizerecon += len(recommendation)
-            print(recommendation)
-            pos += (recommendation > 8).sum()
-            neg += (recommendation <= 8).sum()
-            print(pos, neg)
-            print(sizerecon)
-            nps = (100 * pos / sizerecon) - (100 * neg / sizerecon)
+            for input in test_loader:
 
-        if nps < 0:
-            nps = 0
+                ids = input['input_ids'].view(
+                    batch_size, -1)  # 100, 1, 128 => 100, 128
+                ids = ids.to(device)
+                att_mask = input['attention_mask'].view(batch_size, -1)
+                att_mask = att_mask.to(device)
 
-    print('\nRecommendation score: {} %'.format(nps))
-    print('---------------------------------------------')
+                with torch.no_grad():
+                    output = model(ids, att_mask)
 
-    return nps
-'''
+                recommendation = torch.round(
+                    output.logits.softmax(dim=-1)[:, 1] * 10).sum().item()
+
+                # 앱 추천 지수 출력
+            # print('Recommendation score: {} %'.format(predicted))
+                print('Recommendation score: {} %'.format(recommendation))
+                print('---------------------------------------------')
+                return recommendation
+
+    def mbtiFuction(self, sentence):
+        mbti = ""
+        ei = self.analyze_sentence(sentence, "1", finetuned=True)
+        ns = self.analyze_sentence(sentence, "2", finetuned=True)
+        tf = self.analyze_sentence(sentence, "3", finetuned=True)
+        pj = self.analyze_sentence(sentence, "4", finetuned=True)
+        if (float(ei) > 60.0):
+            mbti += "e"
+        else:
+            mbti += "i"
+
+        if (float(ns) > 60.0):
+            mbti += "n"
+        else:
+            mbti += "s"
+
+        if (float(tf) > 60.0):
+            mbti += "t"
+        else:
+            mbti += "f"
+
+        if (float(pj) > 60.0):
+            mbti += "p"
+        else:
+            mbti += "j"
+
+        return mbti
