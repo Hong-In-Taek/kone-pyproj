@@ -13,7 +13,7 @@ from tqdm import tqdm, tqdm_notebook
 from kobert_tokenizer import KoBERTTokenizer
 
 from transformers import BertForSequenceClassification as BertModel
-tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
+#tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
 
 batch_size = 16
 sequence_length = 128
