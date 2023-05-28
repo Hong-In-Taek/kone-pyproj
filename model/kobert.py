@@ -46,7 +46,7 @@ class kobertMbti:
         test_data = pd.DataFrame([sentence], columns=['text'])
         print(test_data)
         # Evaluation
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device = torch.device('cuda')
         torch.cuda.empty_cache()
         test_dataset = Test_Dataset(test_data)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
