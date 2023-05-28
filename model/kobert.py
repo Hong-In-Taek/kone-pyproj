@@ -51,7 +51,6 @@ class kobertMbti:
         test_dataset = Test_Dataset(test_data)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
-        self.model = BertModel.from_pretrained('skt/kobert-base-v1')
         if finetuned:
             if kind == "1":
                 self.model.load_state_dict(torch.load(
